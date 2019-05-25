@@ -1,15 +1,24 @@
 const mongoose = require('mongoose')
 
 const houseSchema = new mongoose.Schema({
-    name: String,
-    houseID: Number,
-    userIDs: [{userID: Number}],
-    chores: [{
-        name: String, 
-        date: Date,
-        userIndexes: [Number]
-    }],
-    balance: [[Number]]
+    name: {
+        type: String,
+        required: true
+    },
+    users: {
+        type: [String],
+        required: true
+    },
+    chores: [{ 
+        name: {
+            type: String,
+            required: true,
+            unique: true
+        }, 
+        start: Number, 
+        interval: Number, 
+        userIndex: [Number] 
+    }]
 });
 
-export const House = mongoose.model('House', houseSchema)
+module.exports = House = mongoose.model('houses', houseSchema)

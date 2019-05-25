@@ -1,0 +1,11 @@
+.auth-container {
+    margin-top: 20vh;
+}
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    padding: 5px;
+}
+.auth-form-input {
+    margin: 1110px;
+}

@@ -1,27 +1,6 @@
 .navbar{
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
-    width: 100%;
-    border-bottom: 1px solid rgb(248, 248, 248);
-}
-.navbuttons{
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-}
-.navbutton, .homebutton{
-    border: none;
-    font-size: 20px;
-    padding: 15px;
-    background: white;
-    color: rgb(0, 0, 0);
-    transition: color 0.3s;
-}
-.navbutton{
-    width: 126px;
-}
-.navbutton:hover, .homebutton:hover{
-    color: rgb(150,134,227);
-    cursor: pointer;
+    background: grey;
+    padding: 10px;
 }

@@ -3,10 +3,8 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const keys = require("../../config/keys");
-// Load input validation
-const validateRegisterInput = require("../../validation/register");
-const validateLoginInput = require("../../validation/login");
-// Load User model
+const Validator = require("validator");
+// Model
 const User = require("../../models/User");
 
 
@@ -14,10 +12,22 @@ const User = require("../../models/User");
 // @desc Register user
 // @access Public
 router.post("/register", (req, res) => {
-    // Form validation
-    const { errors, isValid } = validateRegisterInput(req.body);
-    // Check validation
-    if (!isValid) return res.status(400).json(errors);
+    const name = req.body.name;
+    const email = req.body.email;
+    const password = req.body.password;
+    const password2 = req.body.password2;
+    const errors = {};
+
+    // Validation
+    if (name.length === 0)          errors.name = "Name is required";
+    if (!Validator.isEmail(email))  errors.email = "Email is invalid";
+    if (email.length === 0)         errors.name = "Email is required";
+    if (password.length === 0)      errors.password = "Password is required";
+    if (password2.length === 0)     errors.password2 = "Confirm your password";
+    if (!Validator.isLength(password, { min: 6, max: 30 }))    errors.password = "Password must be at least 6 characters";
+    if (!Validator.equals(password, password2))           errors.password2 = "Passwords must match";
+    if (errors.email || errors.password || errors.password2 || errors.name) return res.status(400).json(errors);
+
     User.findOne({ email: req.body.email }).then(user => {
         if (user) return res.status(400).json({ email: "Email already exists" });
         const newUser = new User({
@@ -39,20 +49,18 @@ router.post("/register", (req, res) => {
     });
 });
 
-// @route POST api/users/login
-// @desc Login user and return JWT token
-// @access Public
-router.post("/login", (req, res) => {
-    // Form validation
-    const { errors, isValid } = validateLoginInput(req.body);
-    // Check validation
-    if (!isValid) return res.status(400).json(errors);
-
+router.post("/login", (req, res) => {    
     const email = req.body.email;
     const password = req.body.password;
-    // Find user by email
+    const errors = {};
+
+    // Validation
+    if (!Validator.isEmail(email))  errors.email = "Email is invalid";
+    if (email.length === 0)         errors.email = "Email field is required";
+    if (password.length === 0)      errors.password = "Password field is required";
+    if (errors.email || errors.password) return res.status(400).json(errors);
+
     User.findOne({ email }).then(user => {
-        // Check if user exists
         if (!user) return res.status(404).json({ emailnotfound: "Email not found" });
         // Check password
         bcrypt.compare(password, user.password).then(isMatch => {
@@ -80,5 +88,14 @@ router.post("/login", (req, res) => {
         });
     });
 });
+
+router.get("/:id", (req, res) => {
+    User.findById(req.params.id).then(user => {
+        if (!user) return res.status(404).json({ usernotfound: "User not found" });
+        return res.status(400)
+            .json(user);
+    })
+})
+
 
 module.exports = router;
