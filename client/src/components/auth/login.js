@@ -1,102 +1,134 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import axios from 'axios';
 import jwt_decode from "jwt-decode";
 import setAuthToken from "../../utils/setAuthToken";
+import Validator from 'validator';
 
 // Components
-import { Link } from "react-router-dom";
 import Button from '@material-ui/core/Button';
-import Container from '@material-ui/core/Container';
-import FormControl from '@material-ui/core/FormControl';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import Input from '@material-ui/core/Input';
-import InputLabel from '@material-ui/core/InputLabel';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import TextField from '@material-ui/core/TextField';
+import Link from '@material-ui/core/Link';
 import Typography from '@material-ui/core/Typography';
+import { makeStyles } from '@material-ui/core/styles';
+import Container from '@material-ui/core/Container';
 
-// CSS
-import '../../css/auth.css'
+const useStyles = makeStyles(theme => ({
+    '@global': {
+        body: {
+            backgroundColor: theme.palette.common.green,
+        },
+    },
+    paper: {
+        marginTop: theme.spacing(8),
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+    },
+    avatar: {
+        margin: theme.spacing(1),
+        backgroundColor: theme.palette.secondary.main,
+    },
+    form: {
+        width: '100%', // Fix IE 11 issue.
+        marginTop: theme.spacing(1),
+    },
+    submit: {
+        margin: theme.spacing(3, 0, 2),
+    },
+}));
 
-
-class Login extends React.Component {
-    state = {
+const Login = props => {
+    // If user is logged in push to dashboard
+    useEffect(() => {
+        if (props.auth.isAuthenticated) props.history.push('/dashboard');
+    });
+    const classes = useStyles();
+    const [userData, setUserData] = useState({
         email: "",
         password: "",
-        errors: {}
-    }
-
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.auth.isAuthenticated) this.props.history.push("/dashboard");
-    }
-
-    loginUser(userData) {
+    });
+    const [errors, setErrors] = useState({});
+    const loginUser = () => {
         axios.post("/api/users/login", userData)
             .then(res => {
                 const { token } = res.data;
                 localStorage.setItem("jwtToken", token);
                 setAuthToken(token);
                 const decoded = jwt_decode(token);
-                this.props.login(decoded);
+                props.login(decoded);
             })
             .catch(err => {
-                if (err.response) {
-                    let errors = err.response.data;
-                    this.setState({ errors })
-                }
+                const errors = err.response.data;
+                setErrors(errors);
             });
     }
     
-    onChange = e => this.setState({ [e.target.id]: e.target.value });
-
-    onSubmit = e => {
+    const valid = () => {
+        const errors = {};
+        if (!Validator.isEmail(userData.email))  errors.email = "Email is invalid";
+        if (userData.email.length === 0)         errors.email = "Email field is required";
+        if (userData.email.password === 0)       errors.password = "Password field is required";
+        if (errors === {}) return true;
+        return false;
+    }
+    const onSubmit = e => {
         e.preventDefault();
-        const userData = {
-            email: this.state.email,
-            password: this.state.password
-        };
-        this.loginUser(userData);
+        valid();
+        loginUser();
     };
 
-    render() {
-        return(
-            <Container maxWidth="sm" className='auth-container'>
-                <div className='auth-header'>
-                    <Typography className='login-login' variant="h3" align="center" gutterBottom > Log in Below </Typography>
-                    <Typography className='login-text' align="center" gutterBottom > Don't have an Account?   <Link className='login-text' to='/register'> Register here </Link> </Typography>
-                </div>
-                
-                <form noValidate onSubmit={this.onSubmit} className='auth-form'>
-                    <FormControl className="auth-form-input">
-                        <InputLabel htmlFor="email">Email</InputLabel>
-                        <Input
-                        id="email"
-                        value={this.state.email}
-                        onChange={this.onChange}
-                        aria-describedby="email"
-                        />
-                        <FormHelperText error id="email-error">{this.state.errors.email}</FormHelperText>
-                    </FormControl>
-                    <FormControl className="auth-form-input">
-                        <InputLabel htmlFor="component-error">Password</InputLabel>
-                        <Input
-                        id="password"
-                        value={this.state.password}
-                        onChange={this.onChange}
-                        aria-describedby="password"
-                        />
-                        <FormHelperText error id="password-error">{this.state.errors.password || this.state.errors.passwordincorrect}</FormHelperText>
-                    </FormControl>
-                    <Button
-                    variant="contained" 
-                    color="primary"
-                    type="submit"
-                    className="login-button"
-                    >
-                    Log in
-                    </Button>
-                </form>
-            </Container>
-        )
-    }
+    const handleChange = e => setUserData({ ...userData, [e.target.id]: e.target.value});
+
+    return (
+        <Container component="main" maxWidth="xs">
+        <CssBaseline />
+        <div className={classes.paper}>
+        <Typography component="h1" variant="h5">
+            Sign in
+        </Typography>
+        <form className={classes.form} noValidate onSubmit={onSubmit}>
+            <TextField
+                variant="outlined"
+                margin="normal"
+                required
+                fullWidth
+                id="email"
+                label="Email Address"
+                name="email"
+                autoComplete="email"
+                onChange={handleChange}
+                helperText={errors.email}
+            />
+            <TextField
+                variant="outlined"
+                margin="normal"
+                required
+                fullWidth
+                name="password"
+                label="Password"
+                type="password"
+                id="password"
+                autoComplete="current-password"
+                onChange={handleChange}
+                helperText={errors.password}
+            />
+            <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+                className={classes.submit}
+            >
+            Sign In
+            </Button>
+            <Link href="/register" variant="body2">
+                {"Don't have an account? Register"}
+            </Link>
+        </form>
+      </div>
+    </Container>
+    )
 }
 
 export default Login;

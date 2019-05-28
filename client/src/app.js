@@ -3,9 +3,6 @@ import { BrowserRouter as Router, Route } from "react-router-dom";
 import setAuthToken from "./utils/setAuthToken";
 import jwt_decode from 'jwt-decode'
 
-// CSS
-import './css/app.css'
-
 // Components
 import Landing from './components/landing';
 import Register from './components/auth/register';
@@ -40,14 +37,17 @@ class App extends React.Component {
             isAuthenticated: !isEmpty(decoded),
             user: decoded
         });
+        console.log(0)
     }
 
     logout = () => {
         localStorage.removeItem("jwtToken");
         setAuthToken(false);
         this.setState({
+            isAuthenticated: false,
             user: {}
         })
+        console.log('allo mate');
     }
 
     render() {

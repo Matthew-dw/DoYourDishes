@@ -8,21 +8,21 @@ const House = require("../../models/House");
 // @route get api/houses/:id
 // @desc get houses a given user id is in 
 // @access Private
-router.get("/:id",  (req, res) => {
-    const user = req.params.id;
-    House.find({ users: user }).then(houses => {
-        res.json(houses);
-    });    
+router.get("/", passport.authenticate("jwt", { session: false }), (req, res) => {
+    const user = req.user;
+    House.find({ users: user.email }).then(houses => {
+        if (houses) res.json(houses);
+    });
 });
 
 // @route POST api/houses/create
 // @desc Register user
 // @access Private
-router.post("/create",  (req, res) => {
+router.post("/create", passport.authenticate("jwt", { session: false }), (req, res) => {
     const name = req.body.name;
-    const email = req.body.email;
+    const email = req.user.email;
     const errors = {};
-
+    console.log(req.user);
     // Validation
     if (!name)                      errors.name = "Name is required";
     if (!Validator.isEmail(email))  errors.email = "Email is invalid";
@@ -42,7 +42,7 @@ router.post("/create",  (req, res) => {
 // @route POST api/houses/:id/adduser
 // @desc Add user
 // @access Private
-router.post("/:id/adduser",  (req, res) => {
+router.post("/:id/adduser", passport.authenticate("jwt", { session: false }),  (req, res) => {
     const email = req.body.email;
     const id = req.params.id;
     const errors = {};
@@ -62,7 +62,7 @@ router.post("/:id/adduser",  (req, res) => {
 // @route POST api/houses/:id/removeuser
 // @desc Remove user
 // @access Private
-router.post("/:id/removeuser",  (req, res) => {
+router.post("/:id/removeuser", passport.authenticate("jwt", { session: false }),  (req, res) => {
     const email = req.body.email;
     const id = req.params.id;
     const errors = {};
@@ -83,7 +83,7 @@ router.post("/:id/removeuser",  (req, res) => {
 // @route POST api/houses/:id/adduser
 // @desc Add user
 // @access Private
-router.post("/:id/addchore",  (req, res) => {
+router.post("/:id/addchore", passport.authenticate("jwt", { session: false }),  (req, res) => {
     const houseid = req.params.id;
     const name = req.body.name;
     const start = req.body.start;
@@ -117,7 +117,7 @@ router.post("/:id/addchore",  (req, res) => {
 // @route POST api/houses/:id/removeuser
 // @desc Remove user
 // @access Private
-router.delete("/:id/:choreindex",  (req, res) => {
+router.delete("/:id/:choreindex", passport.authenticate("jwt", { session: false }),  (req, res) => {
     const index = req.body.choreindex;
     const id = req.params.id;
     
@@ -130,9 +130,9 @@ router.delete("/:id/:choreindex",  (req, res) => {
 });
 
 // @route POST api/houses/:id/removeuser
-// @desc Remove user
+// @desc Update chore
 // @access Private
-router.post("/:id/:choreindex",  (req, res) => {
+router.post("/:id/:choreindex",passport.authenticate("jwt", { session: false }),  (req, res) => {
     const index = req.body.choreindex;
     const id = req.params.id;
     const name = req.body.name;
