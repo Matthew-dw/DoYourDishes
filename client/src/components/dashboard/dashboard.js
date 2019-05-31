@@ -4,6 +4,7 @@ import axios from 'axios';
 // Dashboard Components
 import HouseScreen from './houseScreen'
 import CreateHouse from './createHouse'
+import JoinHouse from './joinHouse'
 
 // Material
 import Button from '@material-ui/core/Button';
@@ -23,6 +24,7 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 // Icons
 import HomeIcon from '@material-ui/icons/Home';
+import ForwardIcon from '@material-ui/icons/Forward';
 import MenuIcon from '@material-ui/icons/Menu';
 import AddIcon from '@material-ui/icons/Add';
 import ExpandLess from '@material-ui/icons/ExpandLess';
@@ -41,6 +43,7 @@ const useStyles = makeStyles(theme => ({
         },
     },
     appBar: {
+        background: "black",
         flexDirection: "row",
         justifyContent: "space-between",
         marginLeft: drawerWidth,
@@ -68,6 +71,9 @@ const useStyles = makeStyles(theme => ({
         flexGrow: 1,
         padding: theme.spacing(3),
     },
+    list: {
+        padding: 0,
+    },
 }));
 
 const DashBoard = props => {
@@ -75,38 +81,47 @@ const DashBoard = props => {
     useEffect(() => {
         if (!props.auth.isAuthenticated) props.history.push('/login');
     });
+
     const { container } = props;
     const classes = useStyles();
     const theme = useTheme();
-    const [mobileOpen, setMobileOpen] = React.useState();
-    const [houses, setHouses] = React.useState([]);
-    const [createOpen, setCreateOpen] = React.useState(false);
-    const [houseOpen, setHouseOpen] = React.useState(true);
-    const [active, setActive] = React.useState(-1);
 
+    // List of houses
+    const [houses, setHouses] = React.useState([]);
+
+    // State for various menus being open
+    const [mobileOpen, setMobileOpen] = React.useState();
+    const [createOpen, setCreateOpen] = React.useState(false);
+    const [joinOpen, setJoinOpen] = React.useState(false);
+    const [houseOpen, setHouseOpen] = React.useState(true);
+    const handleJoinClick = () => setJoinOpen(!joinOpen);
     const handleHomesClick = () => setHouseOpen(!houseOpen);
     const handleCreateClick = () => setCreateOpen(!createOpen);
     const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
 
+    // Tab state
+    const [active, setActive] = React.useState(-1);
+
+    // Load Houses from database on mount
     useEffect(() => {
         const fetchData = async () => axios.get("/api/houses/")
             .then(res => setHouses(res.data));
         fetchData();
-    });
+    }, []);
 
+    // Logout function
     const onLogoutClick = e => {
         e.preventDefault();
         props.logout();
         props.history.push('/login');
     }
     
-
     // Drawer Component
     const drawer = (
         <div>
         <div className={classes.toolbar} />
         <Divider />
-        <List>
+        <List className={classes.list}>
             <ListItem button onClick={handleHomesClick}>
             <ListItemIcon>
             <HomeIcon />
@@ -114,8 +129,10 @@ const DashBoard = props => {
             <ListItemText primary="Your Houses" />
             {houseOpen ? <ExpandLess /> : <ExpandMore />}
             </ListItem>
+            
             <Collapse in={houseOpen} timeout="auto" unmountOnExit>
-            <List>
+            <List className={classes.list}>
+                <Divider />
                 {houses.map((house, index) => (
                 <ListItem button 
                 key={house.name} 
@@ -128,22 +145,26 @@ const DashBoard = props => {
                 ))}
             </List>
             </Collapse>
+            <Divider />
+            <ListItem button onClick={handleJoinClick}>
+            <ListItemText primary="Join House" />
+            {joinOpen ? <ExpandLess /> : <ForwardIcon />}
+            </ListItem>
+            <Collapse in={joinOpen} timeout="auto" unmountOnExit>
+            <JoinHouse close={handleJoinClick} />
+            </Collapse>
+            <Divider />
             <ListItem button onClick={handleCreateClick}>
-            <ListItemIcon />
             <ListItemText primary="New House" />
             {createOpen ? <ExpandLess /> : <AddIcon />}
             </ListItem>
             <Collapse in={createOpen} timeout="auto" unmountOnExit>
             <CreateHouse close={handleCreateClick} />
             </Collapse>
+            <Divider />
         </List>
         </div>
     );
-
-    const currentDisplay = () => {
-        if (active === -1) return <div />
-        else return <HouseScreen house={houses[active]} />
-    }
 
     return (
         <div className={classes.root}>
@@ -160,7 +181,7 @@ const DashBoard = props => {
                     <MenuIcon />
                 </IconButton>
                 <Typography variant="h6" noWrap >
-                    DoYourDishes
+                    Do Your Dishes
                 </Typography>
                 </Toolbar>
                 <Button className={classes.button} color="inherit" onClick={onLogoutClick}>
@@ -200,7 +221,7 @@ const DashBoard = props => {
             </nav>
             <div>
             <div className={classes.toolbar} />
-            {currentDisplay()}
+            {active !== -1 ? <HouseScreen house={houses[active]} /> : <div />}
             </div>
         </div>
     );

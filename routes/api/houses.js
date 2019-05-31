@@ -5,8 +5,8 @@ const Validator = require("validator");
 // Load House model
 const House = require("../../models/House");
 
-// @route get api/houses/:id
-// @desc get houses a given user id is in 
+// @route Get api/houses/
+// @desc Get houses a user belongs to
 // @access Private
 router.get("/", passport.authenticate("jwt", { session: false }), (req, res) => {
     const user = req.user;
@@ -39,23 +39,18 @@ router.post("/create", passport.authenticate("jwt", { session: false }), (req, r
     .catch(err => console.log(err));
 });
 
-// @route POST api/houses/:id/adduser
+// @route POST api/houses/:id
 // @desc Add user
 // @access Private
-router.post("/:id/adduser", passport.authenticate("jwt", { session: false }),  (req, res) => {
-    const email = req.body.email;
+router.post("/:id", passport.authenticate("jwt", { session: false }),  (req, res) => {
+    const email = req.user.email;
     const id = req.params.id;
-    const errors = {};
-
-    if (!Validator.isEmail(email))  errors.email = "Email is invalid";
-    if (email.length === 0)         errors.email = "Email is required";
-    if (errors.email) return res.status(400).json(errors);
-
     House.findById(id).then(house => {
+        if (house.users.includes(email)) return res.status(400).json({email: 'user already in house'});
         house.users.push(email);
         house.save()
         .then(house => res.json(house))
-        .catch(err => console.log(err));
+        .catch(err => console.log(err) && console.log('add user'));
     });    
 });
 
@@ -66,10 +61,6 @@ router.post("/:id/removeuser", passport.authenticate("jwt", { session: false }),
     const email = req.body.email;
     const id = req.params.id;
     const errors = {};
-
-    if (!Validator.isEmail(email))  errors.email = "Email is invalid";
-    if (email.length === 0)         errors.email = "Email is required";
-    if (errors.email) return res.status(400).json(errors);
     
     House.findById(id).then(house => {
         var index = house.users.indexOf(email);
