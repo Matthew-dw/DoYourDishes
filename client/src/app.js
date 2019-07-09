@@ -4,10 +4,10 @@ import setAuthToken from "./utils/setAuthToken";
 import jwt_decode from 'jwt-decode'
 
 // Components
-import Landing from './components/landing';
-import Register from './components/auth/register';
-import Login from './components/auth/login'
-import Dashboard from "./components/dashboard/dashboard";
+import Landing from './components/Landing';
+import Register from './components/auth/Register';
+import Login from './components/auth/Login'
+import Dashboard from "./components/dashboard/Dashboard";
 
 const isEmpty = require("is-empty");
 
@@ -32,12 +32,11 @@ class App extends React.Component {
         }
     }
 
-    login = (decoded) => {
+    login = decoded => {
         this.setState({
             isAuthenticated: !isEmpty(decoded),
             user: decoded
         });
-        console.log(0)
     }
 
     logout = () => {
@@ -47,16 +46,13 @@ class App extends React.Component {
             isAuthenticated: false,
             user: {}
         })
-        console.log('allo mate');
     }
 
     render() {
         return (
             <Router>
                 <div className="App">
-                <Route exact path="/" render={(props) => <Landing auth={this.state}  {...props} />}/>
-                <Route exact path="/register" render={(props) => <Register auth={this.state} {...props} />}/>
-                <Route exact path="/login" render={(props) => <Login auth={this.state} login={this.login} {...props} />}/>
+                <Route exact path="/" render={(props) => <Landing auth={this.state} login={this.login} logout={this.logout} {...props} />}/>
                 <Route exact path="/dashboard" render={(props) => <Dashboard auth={this.state} logout={this.logout} {...props} />}/>
                 </div>
             </Router>

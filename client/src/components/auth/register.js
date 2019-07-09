@@ -11,13 +11,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 
 const useStyles = makeStyles(theme => ({
-    '@global': {
-        body: {
-            backgroundColor: theme.palette.common.white,
-        },
-    },
     paper: {
-        marginTop: theme.spacing(8),
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -69,9 +63,6 @@ const Register = props => {
         <Container component="main" maxWidth="xs">
         <CssBaseline />
         <div className={classes.paper}>
-        <Typography component="h1" variant="h5">
-          Register
-        </Typography>
         <form className={classes.form} noValidate onSubmit={onSubmit}>
             <TextField
                 variant="outlined"
@@ -79,7 +70,7 @@ const Register = props => {
                 required
                 fullWidth
                 id="name"
-                label="Name"
+                label="Username"
                 name="name"
                 autoComplete="name"
                 autoFocus
@@ -133,9 +124,6 @@ const Register = props => {
             >
             Register
             </Button>
-            <Link href="/login" variant="body2">
-                {"Have an account? Log in"}
-            </Link>
         </form>
       </div>
     </Container>

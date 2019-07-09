@@ -32,34 +32,36 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-const JoinHouse = props => {
+const AddHouse = props => {
   const classes = useStyles();
-  const [id, setId] = useState("");
+  const [name, setName] = useState("");
 
-  const handleChange = event => setId(event.target.value);
+  const handleChange = event => setName(event.target.value);
 
   const submit = e => {
     e.preventDefault();
-    axios.post("/api/houses/" + id).then(res => console.log(res.data));
+    const data = { name: name }
+    axios.post("/api/houses/create", data).then(props.update()).catch(res => console.log(res.data));
   }
+  
   return (
     <div className={classes.root} >
       <form className={classes.container} noValidate onSubmit={submit}>
         <TextField
-          id="HouseLink"
-          label="Link"
-          value={id}
+          id="HouseName"
+          label="Name"
+          value={name}
           className={classes.textField}
           onChange={handleChange}
           margin="normal"
           variant="outlined"
         />   
-        <Button variant="contained" className={classes.button} disabled={id.length !== 24 ? true : false} type="submit" onClick={props.close}>
-          Join House
+        <Button variant="contained" className={classes.button} disabled={name.length === 0 ? true : false} type="submit" onClick={props.close}>
+          Create House
         </Button>
       </form>
     </div>
   );
 }
 
-export default JoinHouse;
+export default AddHouse;

@@ -2,173 +2,98 @@ import React, { useEffect } from 'react';
 import axios from 'axios';
 
 // Dashboard Components
-import HouseScreen from './houseScreen'
-import CreateHouse from './createHouse'
-import JoinHouse from './joinHouse'
+import HouseTabs from './HouseTabs';
+import DrawerContent from './DrawerContent';
 
 // Material
 import Button from '@material-ui/core/Button';
 import AppBar from '@material-ui/core/AppBar';
 import CssBaseline from '@material-ui/core/CssBaseline';
-import Collapse from '@material-ui/core/Collapse';
-import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
 import Hidden from '@material-ui/core/Hidden';
 import IconButton from '@material-ui/core/IconButton';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 // Icons
-import HomeIcon from '@material-ui/icons/Home';
-import ForwardIcon from '@material-ui/icons/Forward';
 import MenuIcon from '@material-ui/icons/Menu';
-import AddIcon from '@material-ui/icons/Add';
-import ExpandLess from '@material-ui/icons/ExpandLess';
-import ExpandMore from '@material-ui/icons/ExpandMore';
 
 const drawerWidth = 240;
 
+// Styles
 const useStyles = makeStyles(theme => ({
     root: {
         display: 'flex',
     },
     drawer: {
-        [theme.breakpoints.up('sm')]: {
-        width: drawerWidth,
+        [theme.breakpoints.up('md')]: {
+        width: '240px',
         flexShrink: 0,
         },
+    },
+    drawerPaper: {
+        width: drawerWidth,
     },
     appBar: {
         background: "black",
         flexDirection: "row",
         justifyContent: "space-between",
         marginLeft: drawerWidth,
-        [theme.breakpoints.up('sm')]: {
+        [theme.breakpoints.up('md')]: {
         width: `calc(100% - ${drawerWidth}px)`,
         },
     },
     menuButton: {
         marginRight: theme.spacing(2),
-        [theme.breakpoints.up('sm')]: {
+        [theme.breakpoints.up('md')]: {
         display: 'none',
         },
     },
     toolbar: theme.mixins.toolbar,
-    drawerPaper: {
-        width: drawerWidth,
-    },
-    nested: {
-        paddingLeft: theme.spacing(4),
-    },
     button: {
         margin: theme.spacing(1),
-    },
-    content: {
-        flexGrow: 1,
-        padding: theme.spacing(3),
-    },
-    list: {
-        padding: 0,
     },
 }));
 
 const DashBoard = props => {
-    // Make user log in
-    useEffect(() => {
-        if (!props.auth.isAuthenticated) props.history.push('/login');
-    });
-
-    const { container } = props;
+    // Style and theme
     const classes = useStyles();
     const theme = useTheme();
-
+    const { container } = props;   
     // List of houses
     const [houses, setHouses] = React.useState([]);
-
-    // State for various menus being open
+    // Mobile drawer state
     const [mobileOpen, setMobileOpen] = React.useState();
-    const [createOpen, setCreateOpen] = React.useState(false);
-    const [joinOpen, setJoinOpen] = React.useState(false);
-    const [houseOpen, setHouseOpen] = React.useState(true);
-    const handleJoinClick = () => setJoinOpen(!joinOpen);
-    const handleHomesClick = () => setHouseOpen(!houseOpen);
-    const handleCreateClick = () => setCreateOpen(!createOpen);
     const handleDrawerToggle = () => setMobileOpen(!mobileOpen);
-
     // Tab state
     const [active, setActive] = React.useState(-1);
-
-    // Load Houses from database on mount
+    // Load Houses from database on mount, update when changed
+    const [update, setUpdate] = React.useState(0);
     useEffect(() => {
         const fetchData = async () => axios.get("/api/houses/")
             .then(res => setHouses(res.data));
         fetchData();
-    }, []);
+    }, [update]);
+    const shouldUpdate = () => setUpdate(update + 1);
+    // Force user log in
+    useEffect(() => {
+        if (!props.auth.isAuthenticated) props.history.push('/');
+    });
 
     // Logout function
     const onLogoutClick = e => {
         e.preventDefault();
         props.logout();
-        props.history.push('/login');
+        props.history.push('/');
     }
     
     // Drawer Component
-    const drawer = (
-        <div>
-        <div className={classes.toolbar} />
-        <Divider />
-        <List className={classes.list}>
-            <ListItem button onClick={handleHomesClick}>
-            <ListItemIcon>
-            <HomeIcon />
-            </ListItemIcon>
-            <ListItemText primary="Your Houses" />
-            {houseOpen ? <ExpandLess /> : <ExpandMore />}
-            </ListItem>
-            
-            <Collapse in={houseOpen} timeout="auto" unmountOnExit>
-            <List className={classes.list}>
-                <Divider />
-                {houses.map((house, index) => (
-                <ListItem button 
-                key={house.name} 
-                className={classes.nested} 
-                onClick={e => setActive(index)}
-                selected={active===index}
-                >
-                    <ListItemText primary={house.name} />
-                </ListItem>
-                ))}
-            </List>
-            </Collapse>
-            <Divider />
-            <ListItem button onClick={handleJoinClick}>
-            <ListItemText primary="Join House" />
-            {joinOpen ? <ExpandLess /> : <ForwardIcon />}
-            </ListItem>
-            <Collapse in={joinOpen} timeout="auto" unmountOnExit>
-            <JoinHouse close={handleJoinClick} />
-            </Collapse>
-            <Divider />
-            <ListItem button onClick={handleCreateClick}>
-            <ListItemText primary="New House" />
-            {createOpen ? <ExpandLess /> : <AddIcon />}
-            </ListItem>
-            <Collapse in={createOpen} timeout="auto" unmountOnExit>
-            <CreateHouse close={handleCreateClick} />
-            </Collapse>
-            <Divider />
-        </List>
-        </div>
-    );
+    const drawer = <DrawerContent houses={houses} active={active} setActive={setActive} update={shouldUpdate}/>
 
     return (
         <div className={classes.root}>
             <CssBaseline />
+
             <AppBar position="fixed" className={classes.appBar}>
                 <Toolbar>
                 <IconButton
@@ -188,9 +113,10 @@ const DashBoard = props => {
                     Sign out
                 </Button>
             </AppBar>
+
             <nav className={classes.drawer}>
                 {/* The implementation can be swapped with js to avoid SEO duplication of links. */}
-                <Hidden smUp implementation="css">
+                <Hidden mdUp implementation="css">
                 <Drawer
                     container={container}
                     variant="temporary"
@@ -207,7 +133,7 @@ const DashBoard = props => {
                     {drawer}
                 </Drawer>
                 </Hidden>
-                <Hidden xsDown implementation="css">
+                <Hidden smDown implementation="css">
                 <Drawer
                     classes={{
                     paper: classes.drawerPaper,
@@ -219,10 +145,7 @@ const DashBoard = props => {
                 </Drawer>
                 </Hidden>
             </nav>
-            <div>
-            <div className={classes.toolbar} />
-            {active !== -1 ? <HouseScreen house={houses[active]} /> : <div />}
-            </div>
+            {active !== -1 ? <HouseTabs house={houses[active]} update={shouldUpdate} reset={() => setActive(-1)} auth={props.auth} /> : <div />}
         </div>
     );
 }

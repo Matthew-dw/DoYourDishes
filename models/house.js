@@ -9,13 +9,21 @@ const houseSchema = new mongoose.Schema({
         type: [String],
         required: true
     },
+    nicknames: [{
+        username: String,
+        nickname: String,
+        color: String,
+    }],
+    pending: {
+        type: [String],
+    },
     chores: [{ 
         name: {
             type: String,
             required: true,
             unique: true
         }, 
-        start: Number, 
+        start: Date, 
         interval: Number, 
         userIndex: [Number] 
     }]

@@ -19,21 +19,26 @@ router.post("/register", (req, res) => {
     const errors = {};
 
     // Validation
-    if (name.length === 0)          errors.name = "Name is required";
+    if (name.length === 0)          errors.name = "Username is required";
     if (!Validator.isEmail(email))  errors.email = "Email is invalid";
-    if (email.length === 0)         errors.name = "Email is required";
+    if (email.length === 0)         errors.email = "Email is required";
     if (password.length === 0)      errors.password = "Password is required";
     if (password2.length === 0)     errors.password2 = "Confirm your password";
     if (!Validator.isLength(password, { min: 6, max: 30 }))    errors.password = "Password must be at least 6 characters";
     if (!Validator.equals(password, password2))           errors.password2 = "Passwords must match";
     if (errors.email || errors.password || errors.password2 || errors.name) return res.status(400).json(errors);
 
-    User.findOne({ email: req.body.email }).then(user => {
+    User.findOne({ email: email }).then(user => {
         if (user) return res.status(400).json({ email: "Email already exists" });
+    });
+
+    User.findOne({ name: name })
+        .then(user => {
+        if (user) return res.status(400).json({ name: "Username already exists" });
         const newUser = new User({
-            name: req.body.name,
-            email: req.body.email,
-            password: req.body.password
+            name: name,
+            email: email,
+            password: password
         });
         // Hash password before saving in database
         bcrypt.genSalt((err, salt) => {
@@ -69,7 +74,8 @@ router.post("/login", (req, res) => {
                 // Create JWT Payload
                 const payload = {
                     id: user.id,
-                    name: user.name
+                    name: user.name,
+                    email: user.email
                 };
                 // Sign token
                 jwt.sign(payload, keys.secretOrKey, { expiresIn: 31556926 },
@@ -88,4 +94,10 @@ router.post("/login", (req, res) => {
         });
     });
 });
+
+router.post("/user", (req, res) => {
+    const email = req.body.email;
+    User.findOne({ email }).then(user => res.json(user.name));
+});
+
 module.exports = router;

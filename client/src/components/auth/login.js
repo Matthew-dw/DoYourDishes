@@ -14,16 +14,9 @@ import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 
 const useStyles = makeStyles(theme => ({
-    '@global': {
-        body: {
-            backgroundColor: theme.palette.common.green,
-        },
-    },
     paper: {
-        marginTop: theme.spacing(8),
         display: 'flex',
         flexDirection: 'column',
-        alignItems: 'center',
     },
     avatar: {
         margin: theme.spacing(1),
@@ -84,15 +77,13 @@ const Login = props => {
         <Container component="main" maxWidth="xs">
         <CssBaseline />
         <div className={classes.paper}>
-        <Typography component="h1" variant="h5">
-            Sign in
-        </Typography>
         <form className={classes.form} noValidate onSubmit={onSubmit}>
             <TextField
                 variant="outlined"
                 margin="normal"
                 required
                 fullWidth
+                autoFocus
                 id="email"
                 label="Email Address"
                 name="email"
@@ -122,9 +113,6 @@ const Login = props => {
             >
             Sign In
             </Button>
-            <Link href="/register" variant="body2">
-                {"Don't have an account? Register"}
-            </Link>
         </form>
       </div>
     </Container>

@@ -1,6 +1,9 @@
 import React from 'react';
-import ChoreList from './choreList'
-import EditHouse from './editHouse'
+
+// Components
+import HouseOverview from './HouseOverview';
+import ChoreList from './ChoreList';
+import HouseEdit from './HouseEdit';
 // Material
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
@@ -21,11 +24,13 @@ const useStyles = makeStyles(theme => ({
   tabs: {
       width: '100%',
       color: 'white',
+      background: theme.palette.background.paper,
       fontSize: theme.typography.h4,
-  } 
+  }, 
+  toolbar: theme.mixins.toolbar,
 }));
   
-const HouseScreen = props => {
+const HouseTabs = props => {
   var house = props.house;
     
   const classes = useStyles();
@@ -33,13 +38,11 @@ const HouseScreen = props => {
   const small = useMediaQuery(theme.breakpoints.up('sm'));
   const [value, setValue] = React.useState(0);
   
-  const handleChange = (event, newValue) => {
-    setValue(newValue);
-    console.log(house);
-  }
+  const handleChange = (event, newValue) => setValue(newValue);
     
   return (
     <div className={small ? classes.rootw : classes.roots}>
+      <div className={classes.toolbar} />
       <Tabs
         value={value}
         onChange={handleChange}
@@ -50,15 +53,15 @@ const HouseScreen = props => {
         className={classes.tabs}
         centered
       >
-        <Tab label={house.name} />
+        <Tab label="Overview" />
         <Tab label="Chores" />
-        <Tab label="Edit House" />
+        <Tab label="Admin " />
       </Tabs>
-      {value === 0 && <div>{house.name}</div>}
-      {value === 1 && <div><ChoreList house={house}/></div>}
-      {value === 2 && <div><EditHouse house={house}/></div>}
+      {value === 0 && <div><HouseOverview house={house} update={props.update} auth={props.auth}/></div>}
+      {value === 1 && <div><ChoreList house={house} update={props.update}/></div>}
+      {value === 2 && <div><HouseEdit house={house} update={props.update} reset={props.reset} auth={props.auth}/></div>}
     </div>
   );
 }
 
-export default HouseScreen;
+export default HouseTabs;
