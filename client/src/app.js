@@ -5,8 +5,6 @@ import jwt_decode from 'jwt-decode'
 
 // Components
 import Landing from './components/Landing';
-import Register from './components/auth/Register';
-import Login from './components/auth/Login'
 import Dashboard from "./components/dashboard/Dashboard";
 
 const isEmpty = require("is-empty");

@@ -5,8 +5,6 @@ import axios from 'axios';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import Link from '@material-ui/core/Link';
-import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 
@@ -45,9 +43,9 @@ const Register = props => {
     const registerUser = userData => {
         axios
         .post("/api/users/register", userData)
-        .then(res => props.history.push("/login"))
+        .then(res => props.goToLogin())
         .catch(err => {
-            const errors = err.response.data;
+            const errors = err;
             setErrors(errors);
         });
     }

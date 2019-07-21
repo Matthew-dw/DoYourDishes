@@ -1,9 +1,9 @@
 import React from 'react';
 
 // Components
-import HouseOverview from './HouseOverview';
-import ChoreList from './ChoreList';
-import HouseEdit from './HouseEdit';
+import HouseOverview from './Overview/HouseOverview';
+import ChoreList from './Chores/ChoreList';
+import HouseEdit from './Admin/HouseEdit';
 // Material
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';

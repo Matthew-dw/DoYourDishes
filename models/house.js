@@ -20,8 +20,6 @@ const houseSchema = new mongoose.Schema({
     chores: [{ 
         name: {
             type: String,
-            required: true,
-            unique: true
         }, 
         start: Date, 
         interval: Number, 

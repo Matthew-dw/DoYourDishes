@@ -31,10 +31,10 @@ router.post("/create", passport.authenticate("jwt", { session: false }), (req, r
     if (!Validator.isEmail(email))  errors.email = "Email is invalid";
     if (!email)                     errors.name = "Email is required";
     if (errors.name || errors.email) return res.status(400).json(errors);
-
     const newHouse = new House({
         name: name,
         users: [email],
+        pending: [],
         nicknames: [{username: email, nickname: '', color: randColor()}]
     })
 

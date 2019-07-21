@@ -1,14 +1,10 @@
 import React, { useState } from 'react';
-import { Link } from "react-router-dom";
 import { makeStyles } from '@material-ui/core/styles';
 
-import Button from '@material-ui/core/Button';
-import Container from '@material-ui/core/Container';
 import Typography from '@material-ui/core/Typography';
-import Grid from '@material-ui/core/Grid';
+import Snackbar from '@material-ui/core/Snackbar';
 import Login from './auth/Login';
 import Register from './auth/Register';
-import { withTheme } from '@material-ui/styles';
 import { Paper } from '@material-ui/core';
 
 
@@ -17,6 +13,9 @@ const useStyles = makeStyles(theme => ({
         display: 'flex',
         flexDirection: 'row',
         margin: 0,
+        [theme.breakpoints.down('md')]: {
+            flexDirection: 'column',
+        },
     },
     half: {
         width: "50%",
@@ -25,6 +24,10 @@ const useStyles = makeStyles(theme => ({
         justifyContent: 'center',
         alignItems: 'center',
         height: '100vh',
+        [theme.breakpoints.down('md')]: {
+            width: "100%",
+            height: 'auto',
+        },
     },
     row: {
         display: 'flex',
@@ -36,7 +39,6 @@ const useStyles = makeStyles(theme => ({
         textAlign: 'center',
         padding: theme.spacing(2),
         '&:hover': {
-            background: '#e8f0fe',
             cursor: 'pointer',
         }
     },
@@ -49,9 +51,26 @@ const useStyles = makeStyles(theme => ({
 const Landing = props => {
     const classes = useStyles();
     const [active, setActive] = useState(0);
+    const [open, setOpen] = React.useState(false);
+    
+    const handleClose = (event, reason) => {
+        if (reason === 'clickaway') return;
+        setOpen(false);
+    }
+
     return (
-        <body><div className={classes.root}>
+       <div className={classes.root}>
         <div className={classes.half}>
+        <Snackbar
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'left',
+        }}
+        open={open}
+        autoHideDuration={6000}
+        onClose={handleClose}
+        message={<span id="message-id">Succesfully Registered</span>}
+         />
         <Typography variant="h2" gutterBottom> Do Your Dishes</Typography>
         <Typography variant="h5" gutterBottom> Tired of useless roommates?</Typography>
         <Typography variant="h5" gutterBottom> Organize your home now</Typography>
@@ -72,11 +91,11 @@ const Landing = props => {
                 </div>
                 <div className={classes.auth}>
                 {active === 0 && <Login auth={props.auth} login={props.login} logout={props.logout} history={props.history} />}
-                {active === 1 && <Register auth={props.auth} login={props.login} logout={props.logout}/>}
+                {active === 1 && <Register auth={props.auth} login={props.login} logout={props.logout} goToLogin={() => {setActive(0); setOpen(true);}}/>}
                 </div>
             </Paper>
         </div>
-    </div></body>
+    </div>
         
     )
 }

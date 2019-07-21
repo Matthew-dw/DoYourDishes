@@ -99,7 +99,7 @@ const UserEdit = props => {
             </DialogContentText>
                 <div className={classes.row}>
                     {colors1.map(color => 
-                        <div 
+                        <div key={color}
                         className={userColor !== color ? classes.colorCircle : classes.activeColorCircle} 
                         style={{backgroundColor: color}}
                         onClick={() => setUserColor(color)}
@@ -108,7 +108,7 @@ const UserEdit = props => {
                 </div>
                 <div className={classes.row}>
                     {colors2.map(color => 
-                        <div 
+                        <div key={color}
                         className={userColor !== color ? classes.colorCircle : classes.activeColorCircle} 
                         style={{backgroundColor: color}}
                         onClick={() => setUserColor(color)}

@@ -28,13 +28,9 @@ router.post("/register", (req, res) => {
     if (!Validator.equals(password, password2))           errors.password2 = "Passwords must match";
     if (errors.email || errors.password || errors.password2 || errors.name) return res.status(400).json(errors);
 
-    User.findOne({ email: email }).then(user => {
-        if (user) return res.status(400).json({ email: "Email already exists" });
-    });
-
-    User.findOne({ name: name })
+    User.findOne({ email: email })
         .then(user => {
-        if (user) return res.status(400).json({ name: "Username already exists" });
+        if (user) return res.status(400).json({ name: "Email already exists" });
         const newUser = new User({
             name: name,
             email: email,
